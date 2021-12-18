@@ -1,7 +1,7 @@
 const express = require('express');
 const { MongoClient } = require('mongodb');
 const ObjectId = require('mongodb').ObjectId;
-
+// dotenv
 require('dotenv').config()
 const cors = require('cors');
 
@@ -76,7 +76,7 @@ async function run() {
             res.json(result)
         });
 
-        // GET orders
+        // GET orders 
         app.get('/orders', async (req, res) => {
             const cursor = MyOrder.find({});
             const orders = await cursor.toArray();
