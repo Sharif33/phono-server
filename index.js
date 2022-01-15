@@ -28,10 +28,43 @@ async function run() {
 
         // GET phones
         app.get('/phones', async (req, res) => {
+            // const query = { isFavourited: true };
             const cursor = mobileCollection.find({});
             const phones = await cursor.toArray();
             res.send(phones);
         });
+
+        // Update fvrt
+        /* app.put('/phones', async (req, res) => {
+            const updated = req.body;
+    
+            const filter = { _id: ObjectId(updated._id) };
+    
+            let updateDoc = {};
+            if(updated.isFavourited)
+            {
+             updated.isFavourited = false;
+             updateDoc = {
+                 $set: {
+                     isFavourited: false
+                 },
+             };
+            }
+    
+            else {
+                updated.isFavourited = true;
+                updateDoc = {
+                    $set: {
+                        isFavourited: true
+                    },
+                };
+               }
+               const result = await mobileCollection.updateOne(filter, updateDoc);
+    
+               if (result) {
+                res.json(updated);
+               }
+          }); */
 
 
         // DELETE phones from ManageProducts
@@ -43,7 +76,7 @@ async function run() {
         });
 
 
-        // GET Single bike
+        // GET Single phone
         app.get('/phones/:id', async (req, res) => {
             const id = req.params.id;
             console.log('getting specific service', id);
@@ -52,7 +85,7 @@ async function run() {
             res.json(bike);
         })
 
-        // POST bike
+        // POST phone
         app.post('/phones', async (req, res) => {
             const bike = req.body;
             console.log('hit the post api', bike);
