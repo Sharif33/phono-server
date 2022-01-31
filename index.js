@@ -225,7 +225,7 @@ async function run() {
             const filter = { _id: ObjectId(id) };
             const updateDoc = {
                 $set: {
-                    payment: payment.payment,
+                    payment: payment
                 }
             };
             const result = await MyOrder.updateOne(filter, updateDoc);
