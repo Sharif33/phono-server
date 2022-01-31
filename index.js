@@ -204,11 +204,11 @@ async function run() {
         app.put("/updateStatus/:id", async (req, res) => {
             const id = req.params.id;
             const filter = { _id: ObjectId(id) };
-
+            const updateStatus = req.body;
             MyOrder
                 .updateOne(filter, {
                     $set: {
-                        status: "Shipped"
+                        status: updateStatus.status,
                     },
                 })
                 .then((result) => {
