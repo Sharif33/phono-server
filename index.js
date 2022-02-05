@@ -34,38 +34,48 @@ async function run() {
             res.send(phones);
         });
 
-        // Update fvrt
-        /* app.put('/phones', async (req, res) => {
-            const updated = req.body;
-    
-            const filter = { _id: ObjectId(updated._id) };
-    
-            let updateDoc = {};
-            if(updated.isFavourited)
-            {
-             updated.isFavourited = false;
-             updateDoc = {
-                 $set: {
-                     isFavourited: false
-                 },
-             };
-            }
-    
-            else {
-                updated.isFavourited = true;
-                updateDoc = {
-                    $set: {
-                        isFavourited: true
+                //Update phones get
+                app.get('/phones/:id', async (req, res) => {
+                    const id = req.params.id;
+                    const query = { _id: ObjectId(id) };
+                    const cursor = await mobileCollection.findOne(query);
+                    // console.log('load user with id: ', id);
+                    res.send(cursor);
+                })
+        
+                //  update phones per id
+                app.put("/phones/:id", async (req, res) => {
+                    const id = req.params.id;
+                    const filter = { _id: ObjectId(id) };
+                    const updatePhones = req.body;
+                    mobileCollection.updateOne(filter, {
+                        $set: {
+                        name: updatePhones.name,
+                        brand: updatePhones.brand,
+                        specs: updatePhones.specs,
+                        processor: updatePhones.processor,
+                        memoery: updatePhones.memoery,
+                        display: updatePhones.display,
+                        battery: updatePhones.battery,
+                        camera: updatePhones.camera,
+                        selfie: updatePhones.selfie,
+                        network: updatePhones.network,
+                        id: updatePhones.id,
+                        contact: updatePhones.contact,
+                        price: updatePhones.price,
+                        star: updatePhones.star,
+                        rating: updatePhones.rating,
+                        image: updatePhones.image,
+                            
                     },
-                };
-               }
-               const result = await mobileCollection.updateOne(filter, updateDoc);
-    
-               if (result) {
-                res.json(updated);
-               }
-          }); */
-
+                        })
+                        .then((result) => {
+                            res.send(result);
+                            console.log(result);
+                        });
+        
+                });
+        
 
         // DELETE phones from ManageProducts
         app.delete('/phones/:id', async (req, res) => {
@@ -191,7 +201,7 @@ async function run() {
             res.json(result);
         });
 
-        //Update get
+        //Update orders get
         app.get('/orders/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
@@ -200,7 +210,7 @@ async function run() {
             res.send(user);
         })
 
-        //  update
+        //  update orders status
         app.put("/updateStatus/:id", async (req, res) => {
             const id = req.params.id;
             const filter = { _id: ObjectId(id) };
@@ -218,7 +228,7 @@ async function run() {
 
         });
 
-        // PAYMENT
+        //orders PAYMENT
         app.put('/orders/:id', async (req, res) => {
             const id = req.params.id;
             const payment = req.body;
@@ -232,6 +242,7 @@ async function run() {
             res.json(result);
         });
 
+        // orders payment post
         app.post('/create-payment-intent', async (req, res) => {
             const paymentInfo = req.body;
             const amount = paymentInfo.price * 100;
