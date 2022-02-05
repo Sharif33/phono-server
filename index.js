@@ -54,7 +54,7 @@ async function run() {
                         brand: updatePhones.brand,
                         specs: updatePhones.specs,
                         processor: updatePhones.processor,
-                        memoery: updatePhones.memoery,
+                        memory: updatePhones.memory,
                         display: updatePhones.display,
                         battery: updatePhones.battery,
                         camera: updatePhones.camera,
