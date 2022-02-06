@@ -48,7 +48,8 @@ async function run() {
                     const id = req.params.id;
                     const filter = { _id: ObjectId(id) };
                     const updatePhones = req.body;
-                    mobileCollection.updateOne(filter, {
+                const options = { upsert: true };
+                    const updateDoc = {
                         $set: {
                         name: updatePhones.name,
                         brand: updatePhones.brand,
@@ -68,12 +69,10 @@ async function run() {
                         image: updatePhones.image,
                             
                     },
-                        })
-                        .then((result) => {
-                            res.send(result);
-                            console.log(result);
-                        });
-        
+                };
+                const result = mobileCollection.updateOne(filter, updateDoc, options)
+                console.log('updating', id)
+                res.json(result)
                 });
         
 
