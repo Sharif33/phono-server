@@ -67,6 +67,8 @@ async function run() {
                         star: updatePhones.star,
                         rating: updatePhones.rating,
                         image: updatePhones.image,
+                        date: updatePhones.date,
+                        time: updatePhones.time
                             
                     },
                 };
