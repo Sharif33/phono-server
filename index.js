@@ -16,31 +16,6 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 app.use(cors());
 app.use(express.json());
 
-// for image upload
-const multer = require('multer');
-const { v4: uuidv4 } = require('uuid');
-let path = require('path');
-
-const storage = multer.diskStorage({
-    destination: function(req, file, cb) {
-        cb(null, 'images');
-    },
-    filename: function(req, file, cb) {   
-        cb(null, uuidv4() + '-' + Date.now() + path.extname(file.originalname));
-    }
-});
-
-const fileFilter = (req, file, cb) => {
-    const allowedFileTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-    if(allowedFileTypes.includes(file.mimetype)) {
-        cb(null, true);
-    } else {
-        cb(null, false);
-    }
-}
-
-let upload = multer({ storage, fileFilter });
-
 async function run() {
     try {
         await client.connect();
@@ -49,7 +24,16 @@ async function run() {
         const usersCollection = database.collection('users');
         const MyOrder = database.collection('orders');
         const Reviews = database.collection('reviews');
+        
 
+          // POST phone
+          app.post('/phones', async (req, res) => {
+            const phone = req.body;
+            console.log('hit the post api', phone);
+            const result = await mobileCollection.insertOne(phone);
+            console.log(result);
+            res.json(result)
+        });
 
         // GET phones
         app.get('/phones', async (req, res) => {
@@ -121,14 +105,7 @@ async function run() {
             res.json(bike);
         })
 
-        // POST phone
-        app.post('/phones',upload.single('photo'), async (req, res) => {
-            const bike = req.body;
-            console.log('hit the post api', bike);
-            const result = await mobileCollection.insertOne(bike);
-            console.log(result);
-            res.json(result)
-        });
+      
 
         // GET Reviews
         app.get('/reviews', async (req, res) => {
