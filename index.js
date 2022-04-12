@@ -23,6 +23,7 @@ async function run() {
         const mobileCollection = database.collection('phones');
         const usersCollection = database.collection('users');
         const MyOrder = database.collection('orders');
+        const MyFavorites = database.collection('favorites');
         const Reviews = database.collection('reviews');
         
 
@@ -137,11 +138,26 @@ async function run() {
             const orders = await cursor.toArray();
             res.send(orders);
         });
+        // GET Favourites 
+        app.get('/favorites', async (req, res) => {
+            const cursor = MyFavorites.find({});
+            const favorites = await cursor.toArray();
+            res.send(favorites);
+        });
 
         // GET all order by email
         app.get("/myOrders/:email", (req, res) => {
             console.log(req.params);
             MyOrder
+                .find({ email: req.params.email })
+                .toArray((err, results) => {
+                    res.send(results);
+                });
+        });
+        // GET all favorite by email
+        app.get("/myFavorite/:email", (req, res) => {
+            console.log(req.params);
+            MyFavorites
                 .find({ email: req.params.email })
                 .toArray((err, results) => {
                     res.send(results);
@@ -155,12 +171,27 @@ async function run() {
             const result = await MyOrder.deleteOne(query);
             res.json(result);
         })
+        //DELETE my favorite
+        app.delete('/myFavorites/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) }
+            const result = await MyFavorites.deleteOne(query);
+            res.json(result);
+        })
 
         // POST orders
         app.post('/orders', async (req, res) => {
             const order = req.body;
             console.log('hit the post api', order);
             const result = await MyOrder.insertOne(order);
+            console.log(result);
+            res.json(result)
+        });
+        // POST Favorites
+        app.post('/favorites', async (req, res) => {
+            const favorite = req.body;
+            console.log('hit the post api', favorite);
+            const result = await MyFavorites.insertOne(order);
             console.log(result);
             res.json(result)
         });
