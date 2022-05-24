@@ -53,11 +53,13 @@ async function run() {
             res.send(phones);
         });
 
-          // POST mobile start
+        // Mobile section start
+
+          // POST mobile
           app.post('/mobiles', async (req, res) => {
-            const phone = req.body;
+            const mobile = req.body;
             // console.log('hit the post api', phone);
-            const result = await mobileCollection2.insertOne(phone);
+            const result = await mobileCollection2.insertOne(mobile);
             // console.log(result);
             res.json(result)
         });
@@ -77,6 +79,68 @@ async function run() {
             const phones = await cursor.toArray();
             res.send(phones);
         });
+
+               //Update mobiles get
+               app.get('/mobiles/:id', async (req, res) => {
+                const id = req.params.id;
+                const query = { _id: ObjectId(id) };
+                const cursor = await mobileCollection2.findOne(query);
+                // console.log('load user with id: ', id);
+                res.send(cursor);
+            })
+    
+            //  update phones per id
+            app.put("/mobiles/:id", async (req, res) => {
+                const id = req.params.id;
+                const filter = { _id: ObjectId(id) };
+                const updatePhones = req.body;
+                const options = { upsert: true };
+                const updateDoc = {
+                    $set: {
+                    name: updatePhones.name,
+                    brand: updatePhones.brand,
+                    os: updatePhones.os,
+                    body: updatePhones.body,
+                    storage: updatePhones.storage,
+                    display_size: updatePhones.display_size,
+                    display_resolution: updatePhones.display_resolution,
+                    battery_size: updatePhones.battery_size,
+                    battery_type: updatePhones.battery_type,
+                    camera_pixels: updatePhones.camera_pixels,
+                    video_pixels: updatePhones.video_pixels,
+                    ram: updatePhones.ram,
+                    chipset: updatePhones.chipset,
+                    id: updatePhones.id,
+                    price: updatePhones.price,
+                    image: updatePhones.image,
+                    date: updatePhones.date,
+                    time: updatePhones.time
+                        
+                },
+            };
+            const result = mobileCollection2.updateOne(filter, updateDoc, options)
+            // console.log('updating', id)
+            res.json(result)
+            });
+    
+
+    // DELETE phones from ManageProducts
+    app.delete('/mobiles/:id', async (req, res) => {
+        const id = req.params.id;
+        const query = { _id: ObjectId(id) };
+        const result = await mobileCollection2.deleteOne(query);
+        res.json(result);
+    });
+
+
+    // GET Single phone
+    app.get('/mobiles/:id', async (req, res) => {
+        const id = req.params.id;
+        // console.log('getting specific service', id);
+        const query = { _id: ObjectId(id) };
+        const phone = await mobileCollection2.findOne(query);
+        res.json(phone);
+    })
 //end
                 //Update phones get
                 app.get('/phones/:id', async (req, res) => {
@@ -117,7 +181,7 @@ async function run() {
                     },
                 };
                 const result = mobileCollection.updateOne(filter, updateDoc, options)
-                console.log('updating', id)
+                // console.log('updating', id)
                 res.json(result)
                 });
         
