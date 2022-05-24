@@ -21,6 +21,7 @@ async function run() {
         await client.connect();
         const database = client.db('mobileManagement');
         const mobileCollection = database.collection('phones');
+        const mobileCollection2 = database.collection('mobiles');
         const usersCollection = database.collection('users');
         const MyOrder = database.collection('orders');
         const MyFavorites = database.collection('favorites');
@@ -30,9 +31,9 @@ async function run() {
           // POST phone
           app.post('/phones', async (req, res) => {
             const phone = req.body;
-            console.log('hit the post api', phone);
+            // console.log('hit the post api', phone);
             const result = await mobileCollection.insertOne(phone);
-            console.log(result);
+            // console.log(result);
             res.json(result)
         });
 
@@ -52,6 +53,31 @@ async function run() {
             res.send(phones);
         });
 
+          // POST mobile start
+          app.post('/mobiles', async (req, res) => {
+            const phone = req.body;
+            // console.log('hit the post api', phone);
+            const result = await mobileCollection2.insertOne(phone);
+            // console.log(result);
+            res.json(result)
+        });
+
+              // Use POST to get data by keys
+              app.post('/mobiles/byKeys', async (req, res) => {
+                const keys = req.body;
+                const query = { key: { $in: keys } }
+                const products = await mobileCollection2.find(query).toArray();
+                res.send(products);
+            });
+
+        // GET mobile
+        app.get('/mobiles', async (req, res) => {
+            // const query = { isFavourited: true };
+            const cursor = mobileCollection2.find({});
+            const phones = await cursor.toArray();
+            res.send(phones);
+        });
+//end
                 //Update phones get
                 app.get('/phones/:id', async (req, res) => {
                     const id = req.params.id;
@@ -66,7 +92,7 @@ async function run() {
                     const id = req.params.id;
                     const filter = { _id: ObjectId(id) };
                     const updatePhones = req.body;
-                const options = { upsert: true };
+                    const options = { upsert: true };
                     const updateDoc = {
                         $set: {
                         name: updatePhones.name,
@@ -108,10 +134,10 @@ async function run() {
         // GET Single phone
         app.get('/phones/:id', async (req, res) => {
             const id = req.params.id;
-            console.log('getting specific service', id);
+            // console.log('getting specific service', id);
             const query = { _id: ObjectId(id) };
-            const bike = await mobileCollection.findOne(query);
-            res.json(bike);
+            const phone = await mobileCollection.findOne(query);
+            res.json(phone);
         })
 
       
@@ -126,9 +152,9 @@ async function run() {
         // POST Review
         app.post('/reviews', async (req, res) => {
             const review = req.body;
-            console.log('hit the post api', review);
+            // console.log('hit the post api', review);
             const result = await Reviews.insertOne(review);
-            console.log(result);
+            // console.log(result);
             res.json(result)
         });
 
@@ -147,7 +173,7 @@ async function run() {
 
         // GET all order by email
         app.get("/myOrders/:email", (req, res) => {
-            console.log(req.params);
+            // console.log(req.params);
             MyOrder
                 .find({ email: req.params.email })
                 .toArray((err, results) => {
@@ -156,7 +182,7 @@ async function run() {
         });
         // GET all favorite by email
         app.get("/myFavorite/:email", (req, res) => {
-            console.log(req.params);
+            // console.log(req.params);
             MyFavorites
                 .find({ email: req.params.email })
                 .toArray((err, results) => {
@@ -182,17 +208,17 @@ async function run() {
         // POST orders
         app.post('/orders', async (req, res) => {
             const order = req.body;
-            console.log('hit the post api', order);
+            // console.log('hit the post api', order);
             const result = await MyOrder.insertOne(order);
-            console.log(result);
+            // console.log(result);
             res.json(result)
         });
         // POST Favorites
         app.post('/favorites', async (req, res) => {
             const favorite = req.body;
-            console.log('hit the post api', favorite);
+            // console.log('hit the post api', favorite);
             const result = await MyFavorites.insertOne(order);
-            console.log(result);
+            // console.log(result);
             res.json(result)
         });
 
@@ -221,7 +247,7 @@ async function run() {
         app.post('/users', async (req, res) => {
             const user = req.body;
             const result = await usersCollection.insertOne(user);
-            console.log(result);
+            // console.log(result);
             res.json(result);
         });
 
@@ -236,7 +262,7 @@ async function run() {
 
         app.put('/users/admin', async (req, res) => {
             const user = req.body;
-            console.log('put', user);
+            // console.log('put', user);
             const filter = { email: user.email };
             const updateDoc = { $set: { role: 'admin' } };
             const result = await usersCollection.updateOne(filter, updateDoc);
