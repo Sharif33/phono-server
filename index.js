@@ -297,6 +297,13 @@ async function run() {
 
         // user and admin part
 
+          // GET users 
+          app.get('/users', async (req, res) => {
+            const cursor = usersCollection.find({});
+            const users = await cursor.toArray();
+            res.send(users);
+        });
+
         app.get('/users/:email', async (req, res) => {
             const email = req.params.email;
             const query = { email: email };
@@ -322,6 +329,29 @@ async function run() {
             const updateDoc = { $set: user };
             const result = await usersCollection.updateOne(filter, updateDoc, options);
             res.json(result);
+        });
+
+        app.put("/users/:id", async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const updateUser = req.body;
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+                name: updateUser.name,
+                displayName: updateUser.displayName,
+                email: updateUser.email,
+                phone: updateUser.phone,
+                address: updateUser.address,
+                region: updateUser.region,
+                city: updateUser.city,
+                zipCode: updateUser.zipCode,
+                gender: updateUser.gender
+            },
+        };
+        const result = usersCollection.updateOne(filter, updateDoc, options)
+        // console.log('updating', id)
+        res.json(result)
         });
 
         app.put('/users/admin', async (req, res) => {
