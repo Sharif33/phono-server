@@ -16,7 +16,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 const admin = require("firebase-admin");
 
 const serviceAccount = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS);
-// const serviceAccount = require('./phono-3a490-firebase-adminsdk-l5unm-a941e604aa.json');
+// const serviceAccount = require('./');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
