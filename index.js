@@ -330,6 +330,16 @@ async function run() {
             res.send(users);
         });
 
+        // single user
+        app.get('/users/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email: email };
+            const user = await usersCollection.findOne(query);
+            // console.log(user);
+            res.send(user);
+        });
+
+        // admin create
         app.get('/users/:email', async (req, res) => {
             const email = req.params.email;
             const query = { email: email };
@@ -360,6 +370,7 @@ async function run() {
         app.put("/users/:email", async (req, res) => {
             const user = req.body;
             const filter = { email: user.email };
+            console.log(user);
             const options = { upsert: true };
             const updateDoc = { $set: user };
             const result = await usersCollection.updateOne(filter, updateDoc, options);
