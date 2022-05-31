@@ -331,11 +331,11 @@ async function run() {
         });
 
         // single user
-        app.get('/users/:email', async (req, res) => {
+        app.get('/usersEmail/:email', async (req, res) => {
             const email = req.params.email;
             const query = { email: email };
             const user = await usersCollection.findOne(query);
-            // console.log(user);
+            console.log(user);
             res.send(user);
         });
 
