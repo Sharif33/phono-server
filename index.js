@@ -50,21 +50,23 @@ async function run() {
         const mobileCollection2 = database.collection('mobiles');
         const usersCollection = database.collection('users');
         const MyOrder = database.collection('orders');
-        const MyFavorites = database.collection('favorites');
+        // const MyFavorites = database.collection('favorites');
         const Reviews = database.collection('reviews');
         
 
-          // POST phone
-          app.post('/phones', async (req, res) => {
-            const phone = req.body;
-            // console.log('hit the post api', phone);
-            const result = await mobileCollection.insertOne(phone);
-            // console.log(result);
-            res.json(result)
-        });
+        /* Offers CRUD */
 
-              // Use POST to get data by keys
-              app.post('/phones/byKeys', async (req, res) => {
+          // POST phone
+            app.post('/phones', async (req, res) => {
+                const phone = req.body;
+                // console.log('hit the post api', phone);
+                const result = await mobileCollection.insertOne(phone);
+                // console.log(result);
+                res.json(result)
+            });
+
+        // Use POST to get data by keys
+            app.post('/phones/byKeys', async (req, res) => {
                 const keys = req.body;
                 const query = { key: { $in: keys } }
                 const products = await mobileCollection.find(query).toArray();
@@ -72,39 +74,105 @@ async function run() {
             });
 
         // GET phones
-        app.get('/phones', async (req, res) => {
-            // const query = { isFavourited: true };
-            const cursor = mobileCollection.find({});
-            const phones = await cursor.toArray();
-            res.send(phones);
+            app.get('/phones', async (req, res) => {
+                // const query = { isFavourited: true };
+                const cursor = mobileCollection.find({});
+                const phones = await cursor.toArray();
+                res.send(phones);
+            });
+
+
+        //Update phones get
+        app.get('/phones/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const cursor = await mobileCollection.findOne(query);
+            // console.log('load user with id: ', id);
+            res.send(cursor);
+        })
+
+        //  update phones per id
+        app.put("/phones/:id", async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const updatePhones = req.body;
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: updatePhones /* {
+                name: updatePhones.name,
+                brand: updatePhones.brand,
+                specs: updatePhones.specs,
+                processor: updatePhones.processor,
+                memory: updatePhones.memory,
+                display: updatePhones.display,
+                battery: updatePhones.battery,
+                camera: updatePhones.camera,
+                selfie: updatePhones.selfie,
+                network: updatePhones.network,
+                id: updatePhones.id,
+                contact: updatePhones.contact,
+                price: updatePhones.price,
+                star: updatePhones.star,
+                rating: updatePhones.rating,
+                image: updatePhones.image,
+                date: updatePhones.date,
+                time: updatePhones.time
+                    
+            }, */
+        };
+        const result = mobileCollection.updateOne(filter, updateDoc, options)
+        // console.log('updating', id)
+        res.json(result)
         });
 
-        // Mobile section start
+
+            // DELETE phones from ManageProducts
+            app.delete('/phones/:id', async (req, res) => {
+                const id = req.params.id;
+                const query = { _id: ObjectId(id) };
+                const result = await mobileCollection.deleteOne(query);
+                res.json(result);
+            });
+
+
+            // GET Single phone
+            app.get('/phones/:id', async (req, res) => {
+                const id = req.params.id;
+                // console.log('getting specific service', id);
+                const query = { _id: ObjectId(id) };
+                const phone = await mobileCollection.findOne(query);
+                res.json(phone);
+            })
+
+        /* Offers CRUD End */    
+        
+
+        /* Mobile section start */
 
           // POST mobile
           app.post('/mobiles', async (req, res) => {
-            const mobile = req.body;
-            // console.log('hit the post api', phone);
-            const result = await mobileCollection2.insertOne(mobile);
-            // console.log(result);
-            res.json(result)
-        });
+                const mobile = req.body;
+                // console.log('hit the post api', phone);
+                const result = await mobileCollection2.insertOne(mobile);
+                // console.log(result);
+                res.json(result)
+           });
 
-              // Use POST to get data by keys
-              app.post('/mobiles/byKeys', async (req, res) => {
+            // Use POST to get data by keys
+            app.post('/mobiles/byKeys', async (req, res) => {
                 const keys = req.body;
                 const query = { key: { $in: keys } }
                 const products = await mobileCollection2.find(query).toArray();
                 res.send(products);
             });
 
-        // GET mobile
-        app.get('/mobiles', async (req, res) => {
-            // const query = { isFavourited: true };
-            const cursor = mobileCollection2.find({});
-            const phones = await cursor.toArray();
-            res.send(phones);
-        });
+            // GET mobile
+            app.get('/mobiles', async (req, res) => {
+                // const query = { isFavourited: true };
+                const cursor = mobileCollection2.find({});
+                const phones = await cursor.toArray();
+                res.send(phones);
+            });
 
                //Update mobiles get
                app.get('/mobiles/:id', async (req, res) => {
@@ -115,122 +183,44 @@ async function run() {
                 res.send(cursor);
             })
     
-            //  update phones per id
+            //  update mobiles per id
             app.put("/mobiles/:id", async (req, res) => {
                 const id = req.params.id;
                 const filter = { _id: ObjectId(id) };
-                const updatePhones = req.body;
+                const updateMobiles = req.body;
                 const options = { upsert: true };
                 const updateDoc = {
-                    $set: {
-                    name: updatePhones.name,
-                    brand: updatePhones.brand,
-                    os: updatePhones.os,
-                    body: updatePhones.body,
-                    storage: updatePhones.storage,
-                    display_size: updatePhones.display_size,
-                    display_resolution: updatePhones.display_resolution,
-                    battery_size: updatePhones.battery_size,
-                    battery_type: updatePhones.battery_type,
-                    camera_pixels: updatePhones.camera_pixels,
-                    video_pixels: updatePhones.video_pixels,
-                    ram: updatePhones.ram,
-                    chipset: updatePhones.chipset,
-                    id: updatePhones.id,
-                    price: updatePhones.price,
-                    image: updatePhones.image,
-                    date: updatePhones.date,
-                    time: updatePhones.time
-                        
-                },
-            };
+                    $set: updateMobiles
+                };
             const result = mobileCollection2.updateOne(filter, updateDoc, options)
             // console.log('updating', id)
             res.json(result)
             });
     
 
-    // DELETE phones from ManageProducts
-    app.delete('/mobiles/:id', async (req, res) => {
-        const id = req.params.id;
-        const query = { _id: ObjectId(id) };
-        const result = await mobileCollection2.deleteOne(query);
-        res.json(result);
-    });
+            // DELETE mobiles from ManageProducts
+            app.delete('/mobiles/:id', async (req, res) => {
+                const id = req.params.id;
+                const query = { _id: ObjectId(id) };
+                const result = await mobileCollection2.deleteOne(query);
+                res.json(result);
+            });
 
 
-    // GET Single phone
-    app.get('/mobiles/:id', async (req, res) => {
-        const id = req.params.id;
-        // console.log('getting specific service', id);
-        const query = { _id: ObjectId(id) };
-        const phone = await mobileCollection2.findOne(query);
-        res.json(phone);
-    })
-//end
-                //Update phones get
-                app.get('/phones/:id', async (req, res) => {
-                    const id = req.params.id;
-                    const query = { _id: ObjectId(id) };
-                    const cursor = await mobileCollection.findOne(query);
-                    // console.log('load user with id: ', id);
-                    res.send(cursor);
-                })
+            // GET Single mobile
+            app.get('/mobiles/:id', async (req, res) => {
+                const id = req.params.id;
+                // console.log('getting specific service', id);
+                const query = { _id: ObjectId(id) };
+                const phone = await mobileCollection2.findOne(query);
+                res.json(phone);
+            })
         
-                //  update phones per id
-                app.put("/phones/:id", async (req, res) => {
-                    const id = req.params.id;
-                    const filter = { _id: ObjectId(id) };
-                    const updatePhones = req.body;
-                    const options = { upsert: true };
-                    const updateDoc = {
-                        $set: {
-                        name: updatePhones.name,
-                        brand: updatePhones.brand,
-                        specs: updatePhones.specs,
-                        processor: updatePhones.processor,
-                        memory: updatePhones.memory,
-                        display: updatePhones.display,
-                        battery: updatePhones.battery,
-                        camera: updatePhones.camera,
-                        selfie: updatePhones.selfie,
-                        network: updatePhones.network,
-                        id: updatePhones.id,
-                        contact: updatePhones.contact,
-                        price: updatePhones.price,
-                        star: updatePhones.star,
-                        rating: updatePhones.rating,
-                        image: updatePhones.image,
-                        date: updatePhones.date,
-                        time: updatePhones.time
-                            
-                    },
-                };
-                const result = mobileCollection.updateOne(filter, updateDoc, options)
-                // console.log('updating', id)
-                res.json(result)
-                });
-        
+            /* Mobile section End */
 
-        // DELETE phones from ManageProducts
-        app.delete('/phones/:id', async (req, res) => {
-            const id = req.params.id;
-            const query = { _id: ObjectId(id) };
-            const result = await mobileCollection.deleteOne(query);
-            res.json(result);
-        });
+                
 
-
-        // GET Single phone
-        app.get('/phones/:id', async (req, res) => {
-            const id = req.params.id;
-            // console.log('getting specific service', id);
-            const query = { _id: ObjectId(id) };
-            const phone = await mobileCollection.findOne(query);
-            res.json(phone);
-        })
-
-      
+      /* Reviews Section */
 
         // GET Reviews
         app.get('/reviews', async (req, res) => {
@@ -248,51 +238,24 @@ async function run() {
             res.json(result)
         });
 
+        /* Reviews section end */
+
+        /* Orders Section start */
+
         // GET orders 
         app.get('/orders', async (req, res) => {
             const cursor = MyOrder.find({});
             const orders = await cursor.toArray();
             res.send(orders);
         });
-        // GET Favourites 
-        app.get('/favorites', async (req, res) => {
-            const cursor = MyFavorites.find({});
-            const favorites = await cursor.toArray();
-            res.send(favorites);
-        });
 
-        // GET all order by email
-        app.get("/myOrders/:email", (req, res) => {
-            // console.log(req.params);
-            MyOrder
-                .find({ email: req.params.email })
-                .toArray((err, results) => {
-                    res.send(results);
-                });
-        });
-        // GET all favorite by email
-        app.get("/myFavorite/:email", (req, res) => {
-            // console.log(req.params);
-            MyFavorites
-                .find({ email: req.params.email })
-                .toArray((err, results) => {
-                    res.send(results);
-                });
-        });
-
-        //DELETE my order
-        app.delete('/myOrders/:id', async (req, res) => {
+        //Update orders get
+        app.get('/orders/:id', async (req, res) => {
             const id = req.params.id;
-            const query = { _id: ObjectId(id) }
-            const result = await MyOrder.deleteOne(query);
-            res.json(result);
-        })
-        //DELETE my favorite
-        app.delete('/myFavorites/:id', async (req, res) => {
-            const id = req.params.id;
-            const query = { _id: ObjectId(id) }
-            const result = await MyFavorites.deleteOne(query);
-            res.json(result);
+            const query = { _id: ObjectId(id) };
+            const user = await MyOrder.findOne(query);
+            // console.log('load user with id: ', id);
+            res.send(user);
         })
 
         // POST orders
@@ -300,14 +263,6 @@ async function run() {
             const order = req.body;
             // console.log('hit the post api', order);
             const result = await MyOrder.insertOne(order);
-            // console.log(result);
-            res.json(result)
-        });
-        // POST Favorites
-        app.post('/favorites', async (req, res) => {
-            const favorite = req.body;
-            // console.log('hit the post api', favorite);
-            const result = await MyFavorites.insertOne(order);
             // console.log(result);
             res.json(result)
         });
@@ -320,8 +275,44 @@ async function run() {
             res.json(result);
         });
 
+        //  update orders status
+        app.put("/updateStatus/:id", async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const updateStatus = req.body;
+            MyOrder
+                .updateOne(filter, {
+                    $set: {
+                        status: updateStatus.status,
+                    },
+                })
+                .then((result) => {
+                    res.send(result);
+                    // console.log(result);
+                });
 
-        // user and admin part
+        });
+
+        // GET all order by email
+        app.get("/myOrders/:email", (req, res) => {
+            // console.log(req.params);
+            MyOrder.find({ email: req.params.email }).toArray((err, results) => {
+                    res.send(results);
+                });
+        });
+
+        //DELETE my order
+        app.delete('/myOrders/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) }
+            const result = await MyOrder.deleteOne(query);
+            res.json(result);
+        })
+
+    /* Orders section end */
+
+
+    /* user and admin part */
 
           // GET users 
           app.get('/users', async (req, res) => {
@@ -335,7 +326,7 @@ async function run() {
             const email = req.params.email;
             const query = { email: email };
             const user = await usersCollection.findOne(query);
-            console.log(user);
+            // console.log(user);
             res.send(user);
         });
 
@@ -351,6 +342,7 @@ async function run() {
             res.json({ admin: isAdmin });
         })
 
+        // user post
         app.post('/users', async (req, res) => {
             const user = req.body;
             const result = await usersCollection.insertOne(user);
@@ -358,6 +350,7 @@ async function run() {
             res.json(result);
         });
 
+        // user update
         app.put('/users', async (req, res) => {
             const user = req.body;
             const filter = { email: user.email };
@@ -367,16 +360,18 @@ async function run() {
             res.json(result);
         });
 
+        // user update by their email
         app.put("/users/:email", async (req, res) => {
             const user = req.body;
             const filter = { email: user.email };
-            console.log(user);
+            // console.log(user);
             const options = { upsert: true };
             const updateDoc = { $set: user };
             const result = await usersCollection.updateOne(filter, updateDoc, options);
             res.json(result);
         });
 
+        // make admin with jwt
         app.put('/users/admin', verifyToken, async (req, res) => {
             const user = req.body;
             // console.log('put', user);
@@ -395,33 +390,11 @@ async function run() {
             }
             
         });
+    
+        /* user and admin part end */
 
-        //Update orders get
-        app.get('/orders/:id', async (req, res) => {
-            const id = req.params.id;
-            const query = { _id: ObjectId(id) };
-            const user = await MyOrder.findOne(query);
-            // console.log('load user with id: ', id);
-            res.send(user);
-        })
 
-        //  update orders status
-        app.put("/updateStatus/:id", async (req, res) => {
-            const id = req.params.id;
-            const filter = { _id: ObjectId(id) };
-            const updateStatus = req.body;
-            MyOrder
-                .updateOne(filter, {
-                    $set: {
-                        status: updateStatus.status,
-                    },
-                })
-                .then((result) => {
-                    res.send(result);
-                    console.log(result);
-                });
-
-        });
+        /* Payment section start */
 
         //orders PAYMENT
         app.put('/orders/:id', async (req, res) => {
@@ -448,7 +421,7 @@ async function run() {
             });
             res.json({ clientSecret: paymentIntent.client_secret })
         })
-
+    /* Payment section end */
 
     }
     finally {
