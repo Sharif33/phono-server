@@ -52,6 +52,7 @@ async function run() {
         const MyOrder = database.collection('orders');
         // const MyFavorites = database.collection('favorites');
         const Reviews = database.collection('reviews');
+        const CustomerReviews = database.collection('customerReviews');
         
 
         /* Offers CRUD */
@@ -239,6 +240,46 @@ async function run() {
         });
 
         /* Reviews section end */
+
+      /*Customer Reviews Section */
+
+        // GET cReviews
+        app.get('/cReviews', async (req, res) => {
+            const cursor = CustomerReviews.find({});
+            const creviews = await cursor.toArray();
+            res.send(creviews);
+        });
+
+        // POST cReview
+        app.post('/cReviews', async (req, res) => {
+            const creview = req.body;
+            // console.log('hit the post api', review);
+            const result = await CustomerReviews.insertOne(creview);
+            // console.log(result);
+            res.json(result)
+        });
+
+         // GET all cReviews by email
+         app.get("/myReviews/:email", (req, res) => {
+            // console.log(req.params);
+        CustomerReviews.find({ email: req.params.email }).toArray((err, results) => {
+                    res.send(results);
+                });
+        });
+
+         //  update cReviews by their email
+         app.put("/cReviews/:email", async (req, res) => {
+            const user = req.body;
+            const filter = { email: user.email };
+            // console.log(user);
+            const options = { upsert: true };
+            const updateDoc = { $set: user };
+            const result = await CustomerReviews.updateOne(filter, updateDoc, options);
+            res.json(result);
+        });
+
+
+        /*Customer Reviews section end */
 
         /* Orders Section start */
 
