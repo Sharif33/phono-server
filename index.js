@@ -7,6 +7,9 @@ require('dotenv').config()
 const cors = require('cors');
 
 const app = express();
+var bodyParser = require('body-parser');
+app.use(bodyParser.json({limit: "50mb"}));
+app.use(bodyParser.urlencoded({limit: "50mb", extended: true, parameterLimit:50000}));
 const port = process.env.PORT || 5000;
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.w273s.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
@@ -42,6 +45,14 @@ if(req.headers?.authorization?.startsWith('Bearer')){
     next();
 }
 
+const cloudinary = require("cloudinary").v2;
+
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
 async function run() {
     try {
         await client.connect();
@@ -60,10 +71,26 @@ async function run() {
           // POST phone
             app.post('/phones', async (req, res) => {
                 const phone = req.body;
-                // console.log('hit the post api', phone);
-                const result = await mobileCollection.insertOne(phone);
-                // console.log(result);
-                res.json(result)
+                const {image} = req.body;
+                try {
+                    if (image) {
+                      const uploadedResponse = await cloudinary.uploader.upload(image, {
+                        upload_preset: "phono-uploads",
+                      });
+                
+                      if (uploadedResponse) {   
+                        // console.log(uploadedResponse);
+                        const img = {...phone, image: uploadedResponse.secure_url};
+                        const result = await mobileCollection.insertOne(img);
+                  // console.log(result);
+                  res.json(result)
+                      }
+                    }
+                  } catch (error) {
+                    console.log(error);
+                    // res.status(500).send(error);
+                  }
+                  
             });
 
         // Use POST to get data by keys
