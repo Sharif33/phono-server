@@ -61,7 +61,7 @@ async function run() {
         const mobileCollection2 = database.collection('mobiles');
         const usersCollection = database.collection('users');
         const MyOrder = database.collection('orders');
-        // const MyFavorites = database.collection('favorites');
+        const Coupons = database.collection('coupons');
         const Reviews = database.collection('reviews');
         const CustomerReviews = database.collection('customerReviews');
         
@@ -307,6 +307,64 @@ async function run() {
 
 
         /*Customer Reviews section end */
+
+        /* Coupon sectio */
+
+          // POST coupon
+          app.post('/coupons', async (req, res) => {
+            const coupon = req.body;
+            const result = await Coupons.insertOne(coupon);
+            res.json(result)
+       });
+
+        // GET coupon
+        app.get('/coupons', async (req, res) => {
+            // const query = { isFavourited: true };
+            const cursor = Coupons.find({});
+            const coupon = await cursor.toArray();
+            res.send(coupon);
+        });
+
+           //Update coupons get
+           app.get('/coupons/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const cursor = await Coupons.findOne(query);
+            res.send(cursor);
+        })
+
+        //  update coupons per id
+        app.put("/coupons/:id", async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const updateMobiles = req.body;
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: updateMobiles
+            };
+        const result = Coupons.updateOne(filter, updateDoc, options)
+        res.json(result)
+        });
+
+
+        // DELETE coupons from ManageCoupons
+        app.delete('/coupons/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await Coupons.deleteOne(query);
+            res.json(result);
+        });
+
+
+        // GET Single coupon
+        app.get('/coupons/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const phone = await Coupons.findOne(query);
+            res.json(phone);
+        })
+    
+        /* Coupon section End */
 
         /* Orders Section start */
 
