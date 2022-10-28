@@ -103,8 +103,15 @@ async function run() {
 
         // GET phones
             app.get('/phones', async (req, res) => {
-                // const query = { isFavourited: true };
                 const cursor = mobileCollection.find({});
+                const phones = await cursor.toArray();
+                res.send(phones);
+            });
+
+        // GET phones
+            app.get('/phonesAp', async (req, res) => {
+                const query = { isApproved: true };
+                const cursor = mobileCollection.find(query);
                 const phones = await cursor.toArray();
                 res.send(phones);
             });
@@ -152,6 +159,38 @@ async function run() {
         // console.log('updating', id)
         res.json(result)
         });
+
+        app.put('/phones', async (req, res) => {
+            const updated = req.body;
+    
+            const filter = { _id: ObjectId(updated._id) };
+    
+            let updateDoc = {};
+            if(updated.isApproved)
+            {
+             updated.isApproved = false;
+             updateDoc = {
+                 $set: {
+                     isApproved: false
+                 },
+             };
+            }
+    
+            else {
+                updated.isApproved = true;
+                updateDoc = {
+                    $set: {
+                        isApproved: true
+                    },
+                };
+               }
+               const result = await mobileCollection.updateOne(filter, updateDoc);
+    
+               if (result) {
+                res.json(updated);
+               }
+          });
+
 
 
             // DELETE phones from ManageProducts
