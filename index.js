@@ -543,10 +543,11 @@ async function run() {
             const requester = req.decodedEmail;
             if(requester){
                 const requesterAccount = await usersCollection.findOne({email: requester});
-                if(requesterAccount.role === 'admin'){
+                if(requesterAccount?.role === 'admin'){
                     const filter = { email: user.email };
                     const updateDoc = { $set: { role: 'admin' } };
                     const result = await usersCollection.updateOne(filter, updateDoc);
+                    console.log(result);
                     res.json(result);
                 }
             }
