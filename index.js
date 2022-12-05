@@ -32,7 +32,7 @@ app.use(express.json());
 
 // jwt
 async function verifyToken(req,res,next){
-if(req.headers?.authorization?.startsWith('Bearer')){
+if(req.headers.authorization.startsWith('Bearer')){
     const token = req.headers.authorization.split(' ')[1];
 
     try {
@@ -466,6 +466,24 @@ async function run() {
                 });
         });
 
+         //  update myOrders status
+         app.put("/myOrders/:id", async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const updateStatus = req.body;
+            MyOrder
+                .updateOne(filter, {
+                    $set: {
+                        status: updateStatus.status,
+                    },
+                })
+                .then((result) => {
+                    res.send(result);
+                    // console.log(result);
+                });
+
+        });
+
         //DELETE my order
         app.delete('/myOrders/:id', async (req, res) => {
             const id = req.params.id;
@@ -487,13 +505,13 @@ async function run() {
         });
 
         // single user
-        app.get('/usersEmail/:email', async (req, res) => {
+        /* app.get('/usersEmail/:email', async (req, res) => {
             const email = req.params.email;
             const query = { email: email };
             const user = await usersCollection.findOne(query);
             // console.log(user);
             res.send(user);
-        });
+        }); */
 
         // admin create
         app.get('/users/:email', async (req, res) => {
@@ -503,8 +521,10 @@ async function run() {
             let isAdmin = false;
             if (user?.role === 'admin') {
                 isAdmin = true;
-            }
-            res.json({ admin: isAdmin });
+                 res.json({ admin: isAdmin });
+            } else{
+              res.send(user);  
+            } 
         })
 
         // user post
@@ -537,7 +557,7 @@ async function run() {
         });
 
         // make admin with jwt
-        app.put('/users/admin', verifyToken, async (req, res) => {
+        app.put('/users/admin/:email', verifyToken, async (req, res) => {
             const user = req.body;
             // console.log('put', user);
             const requester = req.decodedEmail;
@@ -547,7 +567,7 @@ async function run() {
                     const filter = { email: user.email };
                     const updateDoc = { $set: { role: 'admin' } };
                     const result = await usersCollection.updateOne(filter, updateDoc);
-                    console.log(result);
+                    // console.log(result);
                     res.json(result);
                 }
             }
