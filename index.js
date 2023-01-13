@@ -559,7 +559,7 @@ async function run() {
         // make admin with jwt
         app.put('/users/admin/:email', verifyToken, async (req, res) => {
             const user = req.body;
-            // console.log('put', user);
+            console.log('put', user);
             const requester = req.decodedEmail;
             if(requester){
                 const requesterAccount = await usersCollection.findOne({email: requester});
